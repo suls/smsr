@@ -59,3 +59,8 @@ describe SmsR::Config, "existing" do
   
   it "should check if the config version is compatible" 
 end
+
+describe SmsR::Config, "accessing values" do
+  it "should store user,pwd for a given provider"
+  it "should return the stored values for the rovider"
+end
