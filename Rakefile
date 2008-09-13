@@ -7,7 +7,7 @@ require 'smsr/version'
 
 Hoe.new('smsr', SmsR::VERSION::STRING) do |p|
   p.summary = SmsR::VERSION::SUMMARY
-  p.url = 'http://sulsarts.ch/'
+  p.url = 'http://sulsarts.ch/p/smsr'
   p.description = "Simple commandline utility for sending sms."
   p.developer('Mathias Sulser', 'suls@suls.org')
 end
