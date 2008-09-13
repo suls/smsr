@@ -5,5 +5,6 @@ module SmsR
     TINY  = 1
 
     STRING = [MAJOR, MINOR, TINY].join('.')
+    SUMMARY = "SmsR version #{STRING}"
   end
 end

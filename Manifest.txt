@@ -1,0 +1,11 @@
+.autotest
+.gitignore
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/smsr
+lib/smsr.rb
+lib/smsr/version.rb
+spec/smsr_spec.rb
+spec/spec_helper.rb
