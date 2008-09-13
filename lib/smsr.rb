@@ -1,6 +1,7 @@
 $:.unshift File.dirname(__FILE__)
 
 require "smsr/version"
+require "smsr/config"
 require "ostruct"
 require "optparse"
 
@@ -14,6 +15,7 @@ module SmsR
     @options = parse_options(args)
     @debug = @options.debug
     debug "SmsR #{VERSION::STRING} started .."
+    debug *args
   end
   
   def debug(*messages)
