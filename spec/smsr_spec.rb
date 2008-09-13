@@ -1,14 +1,19 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
 describe SmsR, "option parser" do
+
+  before(:all) do
+    @null_output = File.new("/dev/null", "w")
+  end
+  
   it "should enable debugging log by adding --debug cmd option" do
-    SmsR.stub!(:start)
+    SmsR.start(['--debug'], @null_output)
     
     SmsR.should be_debug
   end
   
   it "should disable the debug log by default" do
-    SmsR.stub!(:start)
+    SmsR.start([])
     
     SmsR.should_not be_debug
   end
