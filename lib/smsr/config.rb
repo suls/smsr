@@ -1,3 +1,5 @@
+require 'yaml'
+
 module SmsR
   OperatorConfig = Struct.new(:user, :password)
   
