@@ -10,10 +10,10 @@ module SmsR
   extend self
   
   def start(args, io=STDOUT)
-    @options = parse_options(args)
     @io = io
+    @options = parse_options(args)
     @debug = @options.debug
-    debug "SmsR #{VERSION} started .."
+    debug "SmsR #{VERSION::STRING} started .."
   end
   
   def debug(*messages)
@@ -28,13 +28,23 @@ module SmsR
     options = OpenStruct.new
     options.debug = false
     
-    OptionParser.new do |opts|
-      opts.banner = "Usage: smsr [options]"
+    begin
+      OptionParser.new do |opts|
+        opts.banner = "Usage: smsr [options]"
 
-      opts.on("-d", "--debug", "Show debug log statements") do |d|
-        options.debug = d 
-      end
-    end.parse!(args)
+        opts.on("-d", "--debug", "Show debug log statements") do |d|
+          options.debug = d 
+        end
+        
+        opts.on_tail("--version", "Show version") do
+          @io.puts VERSION::STRING
+          exit
+        end
+      end.parse!(args)
+    rescue OptionParser::InvalidOption => e
+      @io.puts e
+      exit
+    end
     
     options
   end
