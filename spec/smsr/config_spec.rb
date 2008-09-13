@@ -1,14 +1,17 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+require 'fileutils'
+require 'date'
+
 describe SmsR::Config, "fresh" do
 
   before(:each) do
-    @test_file = "/tmp/suhv_test"
-    File.delete(@test_file) if File.exists? @test_file
+    @test_file = "/tmp/smsr_test"
+    FileUtils.rm @test_file, :force => true
   end
   
   after(:each) do
-    File.delete(@test_file) if File.exists? @test_file
+    FileUtils.rm @test_file, :force => true
   end
   
   it "should create new file while saving" do
@@ -26,8 +29,33 @@ describe SmsR::Config, "fresh" do
 end
 
 describe SmsR::Config, "existing" do
-  it "should use file for saving"
-  it "should read config while loading" 
+  before(:each) do
+    @test_file = "/tmp/smsr_test"
+    FileUtils.touch @test_file
+  end
+  
+  after(:each) do
+    FileUtils.rm @test_file, :force => true
+  end
+  
+  it "should use file for saving" do
+    before_t = DateTime.parse(File.stat(@test_file).mtime.to_s)
+    
+    c = SmsR::Config.new @test_file
+    sleep 1 # FIXME: remove sleeper. find better way
+    c.save!    
+    
+    after_t = DateTime.parse(File.stat(@test_file).mtime.to_s)    
+    after_t.should > before_t
+  end
+  
+  it "should read config while loading" do
+    c_created = SmsR::Config.new @test_file
+    c_created.save!
+    
+    c_loaded = SmsR::Config.load @test_file
+    c_loaded.last_saved.should eql(c_created.last_saved)
+  end
   
   it "should check if the config version is compatible" 
 end
