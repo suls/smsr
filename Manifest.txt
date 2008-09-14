@@ -11,6 +11,7 @@ lib/smsr.rb
 lib/smsr/actions.rb
 lib/smsr/config.rb
 lib/smsr/version.rb
+spec/smsr/actions_spec.rb
 spec/smsr/config_spec.rb
 spec/smsr/version_spec.rb
 spec/smsr_spec.rb
