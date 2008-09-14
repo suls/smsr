@@ -8,16 +8,16 @@ module Actions
         child.instance_eval do 
           # initialize_class
           def self.run(args)
-            SmsR.debug "running #{self.name} .. (#{args.size})"
+            SmsR.debug "running #{self.name} .. (#run_#{args.size})"
             runner = self.new
-            runner.run(*args)
+            runner.send :"run_#{args.size}", *args
           end
         end
         super
       end
       
       def runnable(*params, &block)
-        define_method(:run) do |*params|
+        define_method(:"run_#{block.arity}") do |*params|
           SmsR.debug "defining #{self.class}.run method with params: " +
                      "#{params.join(',')}"
           instance_exec(*params, &block) if block_given?
@@ -32,9 +32,9 @@ module Actions
       SmsR.debug provider, user, password
     end
 
-    # runnable do |provider|
-    #   SmsR.debug provider
-    # end    
+    runnable do |provider|
+      SmsR.debug provider
+    end    
     
   end
   

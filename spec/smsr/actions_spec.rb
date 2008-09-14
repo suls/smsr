@@ -24,8 +24,8 @@ describe SmsR::Actions::RunnableAction do
       tuple.first.should eql(tuple.last)
     end
     
-    lambda { SubTest.run(to_test[0..1]) }.should raise_error(ArgumentError)
-    lambda { SubTest.run(to_test << :test4) }.should raise_error(ArgumentError)
+    lambda { SubTest.run(to_test[0..1]) }.should raise_error(NoMethodError)
+    lambda { SubTest.run(to_test << :test4) }.should raise_error(NoMethodError)
     
   end
 end
