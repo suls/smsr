@@ -6,27 +6,20 @@ module Actions
     
       def inherited(child)
         child.instance_eval do 
-          initialize_class
+          # initialize_class
           def self.run(args)
-            SmsR.debug "running #{self.name} .."
-            runner = self.new(args)
-            runner.run *args
+            SmsR.debug "running #{self.name} .. (#{args.size})"
+            runner = self.new
+            runner.run(*args)
           end
         end
         super
       end
       
-      def initialize_class
-        self.class_eval do
-          define_method(:initialize) do |args|
-            @args = args
-          end
-        end
-      end
-      
       def runnable(*params, &block)
-        SmsR.debug "defining run method with params: #{params}"
         define_method(:run) do |*params|
+          SmsR.debug "defining #{self.class}.run method with params: " +
+                     "#{params.join(',')}"
           instance_exec(*params, &block) if block_given?
           self
         end
@@ -35,9 +28,20 @@ module Actions
   end
   
   class Config < RunnableAction
+    runnable do |provider, user, password|
+      SmsR.debug provider, user, password
+    end
+
+    # runnable do |provider|
+    #   SmsR.debug provider
+    # end    
+    
   end
   
   class Send < RunnableAction
+    runnable do |provider, number, text|
+      SmsR.debug provider, number, text
+    end
   end
 end
 end
