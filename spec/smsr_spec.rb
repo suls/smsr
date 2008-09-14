@@ -8,16 +8,16 @@ describe SmsR, "option parser" do
   
   it "should enable debugging log by adding --debug cmd option" do
     SmsR.start(['--debug'], @null_output)
-    SmsR.should be_debug
+    SmsR.options.debug.should be_true
     
     SmsR.start(['-d'], @null_output)
-    SmsR.should be_debug
+    SmsR.options.debug.should be_true
   end
   
   it "should disable the debug log by default" do
     SmsR.start([])
     
-    SmsR.should_not be_debug
+    SmsR.options.debug.should be_false
   end
 end
 

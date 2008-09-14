@@ -8,8 +8,7 @@ require "optparse"
 
 module SmsR
   
-  alias original_send send
-  include Actions
+  # include Actions
   
   # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/232636
   extend self
@@ -18,28 +17,18 @@ module SmsR
     @io = io
     args_copy = args.dup
     @options = parse_options(args)
-    @debug = @options.debug
     
     debug "args: ", args_copy << " "
     debug "options: ", options
     
     debug "SmsR #{VERSION::STRING} started .."
     
-    if args
-      debug "available actions: ", *Actions.instance_methods << " "
-      action = args.shift
-      debug "selected action: #{action}"
-      original_send(action) if Actions.instance_methods.include?(action)
-    end
+    invoke_action args.shift if args.size > 0 if args
     debug ".. exiting SmsR"
   end
   
   def debug(*messages)
-    @io.puts messages.map { |m| "** #{m}" } if debug?
-  end
-
-  def debug?
-    !!@debug
+    @io.puts messages.map { |m| "** #{m}" } if @options.debug
   end
   
   def parse_options(args)
@@ -69,6 +58,18 @@ module SmsR
   
   def options
     @options
+  end
+  
+  def invoke_action(action)
+    action = action.capitalize
+    available_actions = (Actions.constants - ['RunnableAction'])
+    debug "available actions: ", *(available_actions.map{|e| "\t"+e}) << " "
+    
+    if available_actions.include?(action)
+      Actions.module_eval("#{action}.run('hello #{action}!')") 
+    else
+      debug "selected action not available: #{action}"
+    end
   end
   
 end
