@@ -24,7 +24,7 @@ module SmsR
     
     debug "SmsR #{VERSION::STRING} started .."
     
-    invoke_action args.shift if args.size > 0 if args
+    invoke_action(args.shift, args) if args.size > 0 if args
     debug ".. exiting SmsR"
   end
   
@@ -61,13 +61,13 @@ module SmsR
     @options
   end
   
-  def invoke_action(action)
+  def invoke_action(action, args)
     action = action.capitalize
     available_actions = (Actions.constants - ['RunnableAction'])
     debug "available actions: ", *(available_actions.map{|e| "\t"+e}) << " "
     
     if available_actions.include?(action)
-      Actions.module_eval("#{action}.run('hello #{action}!')") 
+      Actions.const_get(action).run(args)
     else
       debug "selected action not available: #{action}"
     end
