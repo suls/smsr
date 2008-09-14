@@ -4,6 +4,8 @@ describe SmsR, "option parser" do
 
   before(:all) do
     @null_output = File.new("/dev/null", "w")
+    SmsR.stub!(:debug)
+    SmsR.stub!(:info)
   end
   
   it "should enable debugging log by adding --debug cmd option" do
@@ -22,14 +24,14 @@ describe SmsR, "option parser" do
 end
 
 describe SmsR, "cmd line tools" do
-  it "should add config to args when smsr-config is invoked" do
+  it "should add 'config' to args when smsr-config is invoked" do
     SmsR.stub!(:start)    
     SmsR.should_receive(:start).with(["config"])
     
     load File.dirname(__FILE__) + '/../bin/smsr-config'
   end
   
-  it "should add send to args when smsr-send is invoked" do
+  it "should add 'send' to args when smsr-send is invoked" do
     SmsR.stub!(:start)    
     SmsR.should_receive(:start).with(["send"])
     
