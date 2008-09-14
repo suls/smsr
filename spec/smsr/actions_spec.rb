@@ -28,4 +28,19 @@ describe SmsR::Actions::RunnableAction do
     lambda { SubTest.run(to_test << :test4) }.should raise_error(NoMethodError)
     
   end
+  
+  it "should call and create #run_0 if no argument is provided" do
+    SmsR.stub!(:debug)
+    
+    $to_modify = false
+    class SubTest < SmsR::Actions::RunnableAction
+      runnable do
+        $to_modify = true
+      end
+    end
+    
+    $to_modify.should be_false
+    SubTest.run([])
+    $to_modify.should be_true
+  end
 end

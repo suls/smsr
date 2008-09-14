@@ -17,7 +17,13 @@ module Actions
       end
       
       def runnable(*params, &block)
-        define_method(:"run_#{block.arity}") do |*params|
+        n_of_block_args = if block.arity > 0
+          block.arity
+        else
+          0
+        end
+        
+        define_method(:"run_#{n_of_block_args}") do |*params|
           SmsR.debug "defining #{self.class}.run method with params: " +
                      "#{params.join(',')}"
           instance_exec(*params, &block) if block_given?
@@ -44,8 +50,12 @@ module Actions
   end
   
   class Send < RunnableAction
-    runnable do |provider, number, text|
-      SmsR.debug provider, number, text
+    runnable do 
+      SmsR.info "TODO: list available providers"
+    end
+    
+    runnable do |provider, number, message|
+      SmsR.info "TODO: implement sending"
     end
   end
 end
