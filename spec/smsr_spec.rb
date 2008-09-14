@@ -27,6 +27,20 @@ describe SmsR::VERSION do
         
     SmsR::VERSION::STRING.should eql(v)
   end
+end
+
+describe SmsR, "cmd line tools" do
+  it "should add config to args when smsr-config is invoked" do
+    SmsR.stub!(:start)    
+    SmsR.should_receive(:start).with(["config"])
+    
+    load File.dirname(__FILE__) + '/../bin/smsr-config'
+  end
   
-  it "should be the same as in the .gemspec" 
+  it "should add send to args when smsr-send is invoked" do
+    SmsR.stub!(:start)    
+    SmsR.should_receive(:start).with(["send"])
+    
+    load File.dirname(__FILE__) + '/../bin/smsr-send'
+  end
 end

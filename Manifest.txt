@@ -6,6 +6,7 @@ README.txt
 Rakefile
 bin/smsr
 bin/smsr-config
+bin/smsr-send
 lib/smsr.rb
 lib/smsr/actions.rb
 lib/smsr/config.rb
