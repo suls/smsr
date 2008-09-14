@@ -25,6 +25,7 @@ module SmsR
     debug "SmsR #{VERSION::STRING} started .."
     
     invoke_action(args.shift, args) if args.size > 0 if args
+    
     debug ".. exiting SmsR"
   end
   
@@ -59,6 +60,10 @@ module SmsR
   
   def options
     @options
+  end
+  
+  def config
+    @config ||= Config.load 
   end
   
   def invoke_action(action, args)

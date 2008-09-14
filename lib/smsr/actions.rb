@@ -29,11 +29,14 @@ module Actions
   
   class Config < RunnableAction
     runnable do |provider, user, password|
-      SmsR.debug provider, user, password
+      SmsR.debug "Store entry for #{provider}"
+      SmsR.config[:"#{provider}"] = user, password
+      SmsR.config.save!
     end
 
     runnable do |provider|
-      SmsR.debug provider
+      SmsR.debug "Show entry for #{provider}"
+      puts SmsR.config[:"#{provider}"]
     end    
     
   end
