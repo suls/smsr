@@ -19,16 +19,6 @@ describe SmsR, "option parser" do
   end
 end
 
-describe SmsR::VERSION do
-  it "should print the version string as MAYOR.MINOR.TINY" do
-    v = "#{SmsR::VERSION::MAJOR}." +
-        "#{SmsR::VERSION::MINOR}." +
-        "#{SmsR::VERSION::TINY}"
-        
-    SmsR::VERSION::STRING.should eql(v)
-  end
-end
-
 describe SmsR, "cmd line tools" do
   it "should add config to args when smsr-config is invoked" do
     SmsR.stub!(:start)    
