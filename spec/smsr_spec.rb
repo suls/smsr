@@ -8,7 +8,9 @@ describe SmsR, "option parser" do
   
   it "should enable debugging log by adding --debug cmd option" do
     SmsR.start(['--debug'], @null_output)
+    SmsR.should be_debug
     
+    SmsR.start(['-d'], @null_output)
     SmsR.should be_debug
   end
   
