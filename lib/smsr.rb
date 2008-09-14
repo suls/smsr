@@ -19,6 +19,7 @@ module SmsR
     args_copy = args.dup
     @options = parse_options(args)
     
+    info ""
     debug "args: ", args_copy << " "
     debug "options: ", options
     
@@ -27,10 +28,17 @@ module SmsR
     invoke_action(args.shift, args) if args.size > 0 if args
     
     debug ".. exiting SmsR"
+    info ""
   end
   
+  # FIXME: duplication!
   def debug(*messages)
     @io.puts messages.map { |m| "** #{m}" } if @options.debug
+  end
+  
+  # FIXME: duplication!
+  def info(*messages)
+    @io.puts messages.map { |m| " #{m}" }
   end
   
   def parse_options(args)
