@@ -16,9 +16,17 @@ module SmsR
       File.open(f_to_save, "w") { |f| YAML.dump(self, f) }
     end
     
-    def initialize(f)
+    def initialize(f=nil)
       @config_file = f
       @config = {}
+    end
+    
+    def []=(key, params)
+      @config[key] = OperatorConfig.new(*params)
+    end
+    
+    def [](key)
+      @config[key]
     end
     
   end

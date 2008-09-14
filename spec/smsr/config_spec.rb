@@ -61,6 +61,21 @@ describe SmsR::Config, "existing" do
 end
 
 describe SmsR::Config, "accessing values" do
-  it "should store user,pwd for a given provider"
-  it "should return the stored values for the rovider"
+  it "should store user,pwd for a given provider" do
+    c = SmsR::Config.new
+    c[:test_op] = "user1", "passwd1"
+    
+    c.instance_variable_get(:@config)[:test_op].user.should eql("user1")
+    c.instance_variable_get(:@config)[:test_op].password.should eql("passwd1")
+  end
+  
+  it "should return the stored values for the rovider" do
+    c = SmsR::Config.new
+    
+    hash = { :test_op => SmsR::OperatorConfig.new("user1", "passwd1") }
+    c.instance_variable_set(:@config, hash)
+    
+    c[:test_op].user.should eql("user1")
+    c[:test_op].password.should eql("passwd1")
+  end
 end
