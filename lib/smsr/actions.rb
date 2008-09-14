@@ -6,7 +6,7 @@ module Actions
       super
 
       def dest_module.run(args)
-        puts "running #{self.name} .."
+        SmsR.debug "running #{self.name} .."
         self.module_eval do
           runner = self.new(args)
           runner.run
@@ -19,7 +19,7 @@ module Actions
     end
     
     def run
-      puts @args
+      SmsR.debug @args
     end  
   end
   
