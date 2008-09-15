@@ -22,12 +22,13 @@ module Actions
         return
       end
       
-      SmsR.debug "using #{provider} with config #{provider_config}"
+      SmsR.debug "using #{provider_itself[:provider]} " +
+                  "with config #{provider_config[:config]}"
       
       
-      provider.call number, message
-      SmsR.info "TODO: implement sending"
-      
+      provider_itself[:provider].call provider_config[:config].user, 
+                                      provider_config[:config].password,
+                                      number, message      
       
     end
   end
