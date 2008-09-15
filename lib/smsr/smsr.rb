@@ -2,10 +2,7 @@ require "ostruct"
 require "optparse"
 
 module SmsR
-  
-  # include Actions
-  
-  # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/232636
+
   extend self
   
   def start(args, io=STDOUT)
@@ -25,9 +22,13 @@ module SmsR
     info ""
   end
   
+  def debug?
+    !!@debug
+  end
+  
   # FIXME: duplication!
   def debug(*messages)
-    @io.puts messages.map { |m| "** #{m}" } if @options.debug
+    @io.puts messages.map { |m| "** #{m}" } if debug?
   end
   
   # FIXME: duplication!
@@ -56,6 +57,8 @@ module SmsR
       @io.puts e
       exit
     end
+    
+    @debug = options.debug
     
     options
   end
