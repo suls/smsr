@@ -14,6 +14,12 @@ module Actions
         SmsR.info provider_itself[:error]
         return
       end
+      
+      unless provider_config[:exists?]
+        SmsR.info(*provider_config[:error])
+        return
+      end
+      
       p_c = SmsR.config[:"#{provider}"]
       SmsR.info "Saved config for Provider '#{provider}':"
       %w{user password}.each { |e|  SmsR.info "  #{e}: #{p_c.send e}"}
