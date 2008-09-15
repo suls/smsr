@@ -11,7 +11,7 @@ Hoe.new('smsr', SmsR::VERSION::STRING) do |p|
   p.url = 'http://sulsarts.ch/p/smsr'
   p.description = "Simple commandline utility for sending sms."
   p.developer('Mathias Sulser', 'suls@suls.org')
-  p.extra_deps << ["mechanize", ">= 0.7.8"]
+  p.extra_deps << ["mechanize", ">= 0.7.8"] << ["rspec", ">= 1.1.4"]
 end
 
 ['audit','test','test_deps','default','publish_docs',
