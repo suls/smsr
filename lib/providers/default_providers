@@ -1,5 +1,6 @@
 require "rubygems"
 require "mechanize"
+require "iconv"
 
 provider :orange do |user, password, number, message|
   SmsR.debug "args: ", user, password, number, message
@@ -31,4 +32,10 @@ provider :orange do |user, password, number, message|
   end
 end
 
-
+def find_form_with_field(page, fieldname)
+  page.forms.each do |form|
+    if form.fields.find{|f| f.name == fieldname}
+      yield form
+    end
+  end
+end
