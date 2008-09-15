@@ -1,18 +1,20 @@
-require "smsr"
-
-module SmsR
+module SmsR  
 module Providers
   extend self
   
-  def provider(*args, &block)
-    # puts "registering #{args}"
-    args.each do |method_name|
-      define_method(method_name) do |*params|
-        instance_exec(*params, &block) if block_given?
-      end
-    end
+  def provider(provider_name, &block)
+    SmsR.debug "registering #{provider_name}"
+    providers[provider_name] = Provider.new(block)
   end
 
+  def providers
+    @providers ||= {}
+  end
   
+  class Provider
+    def initialize(block)
+      add_instance_method :call, block
+    end
+  end
 end
 end

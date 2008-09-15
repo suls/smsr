@@ -1,7 +1,7 @@
 $:.unshift File.dirname(__FILE__)
 
-require "smsr/smsr"
 require "smsr/extensions"
+require "smsr/smsr"
 require "smsr/version"
 require "smsr/config"
 require "smsr/actions"
