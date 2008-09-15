@@ -38,4 +38,10 @@ describe SmsR::Actions::RunnableAction do
     SubTest.run([])
     $to_modify.should be_true
   end
+  
+  
+  it "should test #provider_config "
+  
+  it "should test #provider_itself "
+
 end
