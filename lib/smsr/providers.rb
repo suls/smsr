@@ -31,6 +31,15 @@ module Providers
     def initialize(block)
       add_instance_method :call, block
     end
+    
+    def find_form_with_field(page, fieldname)
+      page.forms.each do |form|
+        if form.fields.find{|f| f.name == fieldname}
+          yield form
+        end
+      end
+    end
+    
   end
 end
 end
