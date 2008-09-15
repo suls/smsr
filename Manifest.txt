@@ -9,9 +9,13 @@ bin/smsr-config
 bin/smsr-send
 lib/smsr.rb
 lib/smsr/actions.rb
+lib/smsr/actions/config.rb
+lib/smsr/actions/send.rb
 lib/smsr/config.rb
 lib/smsr/extensions.rb
 lib/smsr/version.rb
+spec/smsr/actions/config_spec.rb
+spec/smsr/actions/send_spec.rb
 spec/smsr/actions_spec.rb
 spec/smsr/config_spec.rb
 spec/smsr/version_spec.rb
