@@ -7,6 +7,7 @@ Rakefile
 bin/smsr
 bin/smsr-config
 bin/smsr-send
+lib/providers/default_providers
 lib/smsr.rb
 lib/smsr/actions.rb
 lib/smsr/actions/config.rb
