@@ -37,6 +37,12 @@ or
   cd smsr
   rake gem
   rake install_gem
+  
+== ACKNOWLEDGEMENTS:
+
+Thanks to Mirko Stocker for the idea (http://blog.misto.ch/archives/606) and
+to Gui for the Swisscom provider
+(http://giu.me/01-09-2008-sms-senden-leicht-gemacht-swisscom.html).
 
 == LICENSE:
 
