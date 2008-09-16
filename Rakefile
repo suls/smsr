@@ -3,6 +3,7 @@ $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 require 'rake'
 require 'hoe'
 require 'spec/rake/spectask'
+require 'spec/rake/verify_rcov'
 require 'smsr/version'
 
 namespace :hoe do
@@ -12,6 +13,7 @@ Hoe.new('smsr', SmsR::VERSION::STRING) do |p|
   p.description = "Simple commandline utility for sending sms."
   p.developer('Mathias Sulser', 'suls@suls.org')
   p.extra_deps << ["mechanize", ">= 0.7.8"] << ["rspec", ">= 1.1.4"]
+  p.changes = p.paragraphs_of("History.txt", 0..1).join("\n\n")
 end
 
 ['audit','test','test_deps','default','publish_docs',
@@ -28,6 +30,12 @@ namespace :spec do
     t.spec_files = FileList['spec/**/*.rb']
     t.rcov = true
     t.rcov_opts << '--exclude' << 'spec,gems'
+  end
+  
+  desc "Check spec coverage"
+  RCov::VerifyTask.new(:coverage => "spec:rcov") do |t|
+    t.threshold = 90.0 # Make sure you have rcov 0.7 or higher!
+    t.index_html = File.dirname(__FILE__) + '/coverage/index.html'
   end
 
   desc "Run all specs"
