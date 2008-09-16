@@ -32,9 +32,13 @@ end
 namespace :spec do
   desc "Run all specs with rcov"
   Spec::Rake::SpecTask.new('rcov') do |t|
-    t.spec_files = FileList['spec/**/*.rb']
+    t.spec_files = FileList['spec/**/*_spec.rb']
+    p t.spec_files
     t.rcov = true
-    t.rcov_opts << '--exclude' << 'spec,gems'
+    t.rcov_opts << 
+      '--exclude' << 
+      'spec,gems' << 
+      "--text-report"
   end
   
   desc "Check spec coverage"
