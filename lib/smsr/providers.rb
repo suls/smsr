@@ -39,5 +39,10 @@ module ProviderHelper
     end
   end
   
+  def to_ISO_8859_1(msg)
+    require "iconv"
+    Iconv.conv("ISO-8859-1", "UTF-8", message)
+  end
+  
 end
 end

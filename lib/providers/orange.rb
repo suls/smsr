@@ -21,7 +21,7 @@ provider :orange do |user, password, number, message|
       SmsR.debug "start sending .."
       find_form_with_field(page, 'messageInput') do |f|
         f.destinationNumberInput = number
-        f.messageInput = Iconv.conv("ISO-8859-1", "UTF-8", message)
+        f.messageInput = to_ISO_8859_1(message)
         f.wui_target_id = 'sendButton'
         f.wui_event_id = 'onclick'
         f.submit
