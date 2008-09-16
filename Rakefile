@@ -6,6 +6,11 @@ require 'spec/rake/spectask'
 require 'spec/rake/verify_rcov'
 require 'smsr/version'
 
+
+desc "Clean up everything"
+task :clean => ["spec:clobber_rcov", "hoe:clean"] do
+end
+
 namespace :hoe do
 Hoe.new('smsr', SmsR::VERSION::STRING) do |p|
   p.summary = SmsR::VERSION::SUMMARY
@@ -43,3 +48,4 @@ namespace :spec do
     t.spec_files = FileList['spec/**/*.rb']
   end
 end
+
