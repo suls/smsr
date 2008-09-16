@@ -13,7 +13,7 @@ module Actions
             
             SmsR.debug "running #{self.name} .. (#run_#{args.size})"
             runner = self.new(args.first)
-            runner.send :"run_#{args.size}", *args
+            runner.send(:"run_#{args.size}", *args) if runner.check
           end
         end
         super
@@ -21,7 +21,7 @@ module Actions
       
       def initialize_class
         self.class_eval do
-          define_method(:initialize) do |args|
+          define_method(:initialize) do |*args|
             @provider_name = args
           end
         end
@@ -34,12 +34,18 @@ module Actions
           0
         end
         
-        reqs.each { |req| send req; puts " send #{req}" }
+        define_method(:check) do |*args|
+          success = true
+          reqs.each do |req|
+            success = RunnableAction.send(req.to_sym) if success
+          end
+          success
+        end
+        
         define_method(:"run_#{n_of_block_args}") do |*params|
           SmsR.debug "defining #{self.class}.run method with params: ",
                      "  #{params.join(',')}"
           instance_exec(*params, &block) if block_given?
-          self
         end
       end
       

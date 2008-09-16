@@ -38,25 +38,37 @@ describe SmsR::Actions::RunnableAction do
     SubTest.run([])
     $to_modify.should be_true
   end
-  
-  it "should call the defined requirements in sequence" do
-    SubTest.stub!(:a)
-    SubTest.stub!(:b)
-
-    SubTest.should_receive(:a)
-    SubTest.should_receive(:b)
+  it "should run the defined requirements in sequence" do
+    SmsR::Actions::RunnableAction.should_receive(:first).and_return(true)
+    SmsR::Actions::RunnableAction.should_receive(:second).and_return(false)
+    SmsR::Actions::RunnableAction.should_not_receive(:third)
    
     class SubTest < SmsR::Actions::RunnableAction
-      runnable :a, :b do |param|
-        param*param
+      runnable :first, :second, :third do
       end
     end
     
-    SubTest.run []
+    st = SubTest.new
+    st.check.should be(false)
+  end
+  
+  it "should run if all requirements are met" do
+    SmsR::Actions::RunnableAction.stub!(:first).and_return(true)
+    SmsR::Actions::RunnableAction.stub!(:second).and_return(true)
+    
+    class SubTest < SmsR::Actions::RunnableAction
+      runnable :first, :second do |param|
+        param*param
+      end
+    end
+
+    SubTest.run([2]).should be(4)
   end
   
   it "should should abort if one of the requirements isn't fulfilled"
-  
+end
+
+describe SmsR::Actions::RunnableAction, "requirements" do
   it "should test #provider_config "
   
   it "should test #provider_itself "
