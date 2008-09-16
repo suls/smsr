@@ -80,8 +80,34 @@ describe SmsR::Actions::RunnableAction do
 end
 
 describe SmsR::Actions::RunnableAction, "requirements" do
-  it "should test #provider_config "
   
-  it "should test #provider_itself "
+  before(:all) do
+    @config = mock("Config")
+    SmsR::Config.stub!(:load).and_return(@config)
+  end
+  
+  it "#config should return false " +
+     "if no config for provider :nonexisting_provider exists" do
+
+    @config.should_receive(:[]).
+           with(:nonexisting_provider).
+           and_return(nil)
+
+    SmsR::Actions::RunnableAction.
+      config(:nonexisting_provider).should be(false)
+  end
+  
+  it "#config should return 'true' "+
+     "if config for provider :existing_provider exists" do
+
+    @config.should_receive(:[]).
+             with(:existing_provider).
+             and_return(SmsR::OperatorConfig.new)
+    
+    SmsR::Actions::RunnableAction.
+      config(:existing_provider).should be(true)
+  end
+  
+  it "should test #provider "
 
 end
