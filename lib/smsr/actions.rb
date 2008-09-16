@@ -11,9 +11,15 @@ module Actions
           def self.run(*args)
             SmsR::Providers.load
             args.flatten!
-            SmsR.debug "running #{self.name} .. (#run_#{args.size})"
+            SmsR.debug "running #{self.name} .. (#run_#{args.size})",
+                        "with args: #{args.join(',')}"
             runner = self.new(args.first)
-            runner.send(:"run_#{args.size}", *args) if runner.check
+
+            if runner.check
+              runner.send(:"run_#{args.size}", *args)
+            else
+              SmsR.info runner.error
+            end
           end
         end
         super
@@ -21,8 +27,9 @@ module Actions
       
       def initialize_class
         self.class_eval do
-          define_method(:initialize) do |*args|
-            @provider_name = args
+          define_method(:initialize) do |provider|
+            @provider = provider.to_sym if provider
+            @error = false
           end
         end
       end
@@ -34,12 +41,15 @@ module Actions
           0
         end
         
-        define_method(:check) do |*args|
-          success = true
-          reqs.each do |req|
-            success = RunnableAction.send(req.to_sym) if success
+        define_method(:check) do
+          ret_val = true
+          reqs.inject(ret_val) do |succ, req|
+            if succ
+              succ, @error = RunnableAction.send(req.to_sym, @provider)
+            end
+            ret_val = succ
           end
-          success
+          ret_val
         end
         
         define_method(:"run_#{n_of_block_args}") do |*params|
@@ -47,21 +57,24 @@ module Actions
                      "  #{params.join(',')}"
           instance_exec(*params, &block) if block_given?
         end
+        
+        define_method(:error) do
+          @error
+        end
       end
       
-      def config(for_provider)
-        !!SmsR.config[for_provider.to_sym]
-        # :error => ["No config for #{@provider_name} found. Run:",
-        #             "", "  smsr-config #{@provider_name} username password",
-        #             "", "to set up the config for the selected provider."],        
+      def config(provider_name)
+        [!!SmsR.config[provider_name.to_sym], 
+          ["No config for #{provider_name} found. Run:",
+            "", "  smsr-config #{provider_name} username password",
+            "", "to set up the config for the selected provider."]]
       end
 
-      def provider(name)
-        !!SmsR::Providers.providers[name]
-        # {:exists? => !!SmsR::Providers.providers[@provider_name.to_sym],
-        #   :error => ["Provider '#{@provider_name}' not found."],
-        #   :provider => SmsR::Providers.providers[@provider_name.to_sym] }
+      def provider(provider_name)
+        [!!SmsR::Providers.providers[provider_name.to_sym], 
+          ["Provider '#{provider_name}' not found."]]
       end
+      
     end
 
   end
