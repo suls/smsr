@@ -2,7 +2,6 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe SmsR::Actions::RunnableAction do
   it "should call Instance#run by running Class#run" do
-    
     SmsR.stub!(:debug)
     
     $to_modify = []
@@ -62,7 +61,7 @@ describe SmsR::Actions::RunnableAction do
       end
     end
 
-    SubTest.run([2]).should be(4)
+    SubTest.run(2).should be(4)
   end
   
   it "should not execute runnable" +
@@ -76,7 +75,7 @@ describe SmsR::Actions::RunnableAction do
       end
      end
 
-     lambda { SubTest.run([]) }.should_not throw_symbol(:was_run)   
+     lambda { SubTest.run }.should_not throw_symbol(:was_run)   
    end
 end
 

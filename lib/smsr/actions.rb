@@ -8,9 +8,9 @@ module Actions
       def inherited(child)
         child.instance_eval do 
           initialize_class
-          def self.run(args)
+          def self.run(*args)
             SmsR::Providers.load
-            
+            args.flatten!
             SmsR.debug "running #{self.name} .. (#run_#{args.size})"
             runner = self.new(args.first)
             runner.send(:"run_#{args.size}", *args) if runner.check
