@@ -65,7 +65,19 @@ describe SmsR::Actions::RunnableAction do
     SubTest.run([2]).should be(4)
   end
   
-  it "should should abort if one of the requirements isn't fulfilled"
+  it "should not execute runnable" +
+     "if one of the requirements isn't fulfilled" do
+     SmsR::Actions::RunnableAction.stub!(:first).and_return(false)
+     SmsR::Actions::RunnableAction.stub!(:second).and_return(true)
+
+     class SubTest < SmsR::Actions::RunnableAction
+      runnable :first, :second do
+        throw :was_run
+      end
+     end
+
+     lambda { SubTest.run([]) }.should_not throw_symbol(:was_run)   
+   end
 end
 
 describe SmsR::Actions::RunnableAction, "requirements" do
