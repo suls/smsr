@@ -51,12 +51,16 @@ module Actions
       
       def config(for_provider)
         !!SmsR.config[for_provider.to_sym]
+        # :error => ["No config for #{@provider_name} found. Run:",
+        #             "", "  smsr-config #{@provider_name} username password",
+        #             "", "to set up the config for the selected provider."],        
       end
 
-      def provider_itself
-        {:exists? => !!SmsR::Providers.providers[@provider_name.to_sym],
-          :error => ["Provider '#{@provider_name}' not found."],
-          :provider => SmsR::Providers.providers[@provider_name.to_sym] }
+      def provider(name)
+        !!SmsR::Providers.providers[name]
+        # {:exists? => !!SmsR::Providers.providers[@provider_name.to_sym],
+        #   :error => ["Provider '#{@provider_name}' not found."],
+        #   :provider => SmsR::Providers.providers[@provider_name.to_sym] }
       end
     end
 

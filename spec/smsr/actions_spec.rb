@@ -79,14 +79,14 @@ describe SmsR::Actions::RunnableAction do
    end
 end
 
-describe SmsR::Actions::RunnableAction, "requirements" do
+describe SmsR::Actions::RunnableAction, "requirement #config" do
   
   before(:all) do
     @config = mock("Config")
     SmsR::Config.stub!(:load).and_return(@config)
   end
   
-  it "#config should return false " +
+  it "should return false " +
      "if no config for provider :nonexisting_provider exists" do
 
     @config.should_receive(:[]).
@@ -107,7 +107,25 @@ describe SmsR::Actions::RunnableAction, "requirements" do
     SmsR::Actions::RunnableAction.
       config(:existing_provider).should be(true)
   end
+end
+
+describe SmsR::Actions::RunnableAction, "requirement #provider" do  
+  before(:all) do
+    prov_hash = {:existing_provider =>
+                    SmsR::Providers::Provider.new(lambda {  } ) }
+    SmsR::Providers.stub!(:providers).and_return(prov_hash)
+  end
   
-  it "should test #provider "
+  it "should return 'true' for :existing_provider" do
+    SmsR::Actions::RunnableAction.
+      provider(:existing_provider).should be(true)
+  end
+  
+  it "should return 'false' for :nonexisting_provider" do
+    # SmsR::Providers.providers[@provider_name.to_sym]
+    
+    SmsR::Actions::RunnableAction.
+      provider(:nonexisting_provider).should be(false)
+  end
 
 end
