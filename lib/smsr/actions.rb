@@ -27,13 +27,14 @@ module Actions
         end
       end
       
-      def runnable(*params, &block)
+      def runnable(*reqs, &block)
         n_of_block_args = if block.arity > 0
           block.arity
         else
           0
         end
         
+        reqs.each { |req| send req; puts " send #{req}" }
         define_method(:"run_#{n_of_block_args}") do |*params|
           SmsR.debug "defining #{self.class}.run method with params: ",
                      "  #{params.join(',')}"
@@ -41,21 +42,22 @@ module Actions
           self
         end
       end
+      
+      def provider_config
+        {:exists? => !!SmsR.config[@provider_name.to_sym],
+          :error => ["No config for #{@provider_name} found. Run:",
+                    "", "  smsr-config #{@provider_name} username password",
+                    "", "to set up the config for the selected provider."],
+          :config => SmsR.config[@provider_name.to_sym] }
+      end
+
+      def provider_itself
+        {:exists? => !!SmsR::Providers.providers[@provider_name.to_sym],
+          :error => ["Provider '#{@provider_name}' not found."],
+          :provider => SmsR::Providers.providers[@provider_name.to_sym] }
+      end
     end
 
-    def provider_config
-      {:exists? => !!SmsR.config[@provider_name.to_sym],
-        :error => ["No config for #{@provider_name} found. Run:",
-                  "", "  smsr-config #{@provider_name} username password",
-                  "", "to set up the config for the selected provider."],
-        :config => SmsR.config[@provider_name.to_sym] }
-    end
-    
-    def provider_itself
-      {:exists? => !!SmsR::Providers.providers[@provider_name.to_sym],
-        :error => ["Provider '#{@provider_name}' not found."],
-        :provider => SmsR::Providers.providers[@provider_name.to_sym] }
-    end
   end
 
 end
