@@ -87,6 +87,13 @@ module Actions
       end
       !!@provider
     end
+    
+    def load_providers
+      require "rubygems"
+      require "rake"
+      providers = FileList["#{SmsR::Providers::DEFAULT_PROVIDERS}/*.rb"]
+      SmsR::Providers.load(*providers)
+    end
   end
   # module requirements
   # included in Concr.Action

@@ -5,9 +5,7 @@ module SmsR
 module Actions
   
     class Send < RunnableAction
-    runnable do 
-      SmsR::Providers.load(*FileList["#{SmsR::Providers::DEFAULT_PROVIDERS}/*.rb"])
-      
+    runnable :load_providers do 
       SmsR.info "Available providers:"
       SmsR::Providers.providers.each { |k,v| SmsR.info "  #{k}"}
     end
