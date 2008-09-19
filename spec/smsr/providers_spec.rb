@@ -49,6 +49,7 @@ describe SmsR::Providers, "from file" do
     
 PD
     File.open(@provider_file, 'w') {|f| f.write(provider_def) }
+    SmsR::Providers.reset
   end
   
   after(:each) do
@@ -56,7 +57,7 @@ PD
   end
   
   it "should load the provider specified in a file" do
-    SmsR::Providers.load @provider_file, true
+    SmsR::Providers.load @provider_file
     
     SmsR::Providers.providers.should have(1).provider
     
@@ -73,7 +74,7 @@ PD
     
 PD
     File.open(@provider_file, 'a') {|f| f.write(provider_def) }
-    SmsR::Providers.load @provider_file, true
+    SmsR::Providers.load @provider_file
     
     SmsR::Providers.providers.should have(2).provider
     

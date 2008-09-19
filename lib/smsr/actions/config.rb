@@ -9,17 +9,7 @@ module Actions
       SmsR.info "Config for #{provider} added."
     end
 
-    runnable do |provider|
-      unless provider_itself[:exists?]
-        SmsR.info provider_itself[:error]
-        return
-      end
-      
-      unless provider_config[:exists?]
-        SmsR.info(*provider_config[:error])
-        return
-      end
-      
+    runnable :config do |provider|
       p_c = SmsR.config[:"#{provider}"]
       SmsR.info "Saved config for Provider '#{provider}':"
       %w{user password}.each { |e|  SmsR.info "  #{e}: #{p_c.send e}"}

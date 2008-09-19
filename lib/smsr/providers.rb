@@ -1,8 +1,8 @@
 module SmsR  
 module Providers
   
-  DEFAULT_PROVIDERS_FILE = File.dirname(__FILE__) + 
-                          '/../providers/default_providers'
+  DEFAULT_PROVIDERS = File.dirname(__FILE__) + 
+                          '/../providers'
   
   extend self
   
@@ -15,16 +15,22 @@ module Providers
     @providers ||= {}
   end
   
-  def load(file=DEFAULT_PROVIDERS_FILE, drop_existing=false)
-    if File.exists? file
-      SmsR.debug "Loading providers from: #{file}"
-      data = File.read(file)
-      @providers = {} if drop_existing
-      module_eval data, file
-    else
-      SmsR.debug "Provider file #{file} doesn't exist."
+  def reset
+    @providers = {}
+  end
+  
+  def load(*files)
+    files.each do |file|
+      if File.exists? file
+        SmsR.debug "Loading providers from: #{file}"
+        data = File.read(file)
+        # @providers = {} if drop_existing
+        module_eval data, file
+      else
+        SmsR.info "Provider file #{file} doesn't exist."
+      end
     end
-    @providers
+    providers
   end
   
 end

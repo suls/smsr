@@ -1,28 +1,40 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe SmsR::Actions::RunnableAction do
-  it "should call Instance#run by running Class#run" do
+  
+  before(:each) do
+    Object.send(:remove_const, :SubTest) if defined? SubTest
+  end
+  
+  after(:each) do
+    Object.send(:remove_const, :SubTest) if defined? SubTest
+  end
+  
+  it "should call Instance#run_N by running Class#run(N)" do
     SmsR.stub!(:debug)
     
-    $to_modify = []
     class SubTest < SmsR::Actions::RunnableAction
-      runnable do |test1, test2, test3|
-        $to_modify = [test1, test2, test3]
+      runnable do
+        throw :none
+      end
+      
+      runnable do |one|
+        throw one.to_sym
+      end
+            
+      runnable do |one, two|
+        throw two.to_sym
+      end
+      
+      runnable do |one, two, three|
+        throw three.to_sym
       end
     end
     
-    to_test = [:test1, :test2, :test3]
-    SubTest.run(to_test)
-    
-    $to_modify.zip(to_test).each do |tuple|
-      tuple.first.should eql(tuple.last)
-    end
-    
-    lambda { SubTest.run(to_test[0..1]) }.
-        should raise_error(NoMethodError)
-        
-    lambda { SubTest.run(to_test << :test4) }.
-        should raise_error(NoMethodError)
+    lambda { SubTest.run }.should throw_symbol(:none)
+    lambda { SubTest.run :one }.should throw_symbol(:one)
+    lambda { SubTest.run :one, :two}.should throw_symbol(:two)
+    lambda { SubTest.run :one, :two, :three}.should throw_symbol(:three)
   end
   
   it "should call and create #run_0 if no argument is provided" do
@@ -37,138 +49,182 @@ describe SmsR::Actions::RunnableAction do
     lambda { SuperSubTest.run }.should throw_symbol(:run)
   end
   
-  it "should run the defined requirements in sequence" do
-    SmsR::Actions::RunnableAction.should_receive(:first).and_return(true)
-    SmsR::Actions::RunnableAction.should_receive(:second).and_return(false)
-    SmsR::Actions::RunnableAction.should_not_receive(:third)
-   
-    class SubTest < SmsR::Actions::RunnableAction
-      runnable :first, :second, :third do |x|
-      end
-    end
-    
-    st = SubTest.new :x
-    st.check.should be(false)
-  end
-  
   it "should run if all requirements are met" do
-    SmsR::Actions::RunnableAction.stub!(:first).and_return(true)
-    SmsR::Actions::RunnableAction.stub!(:second).and_return(true)
+    helper = mock("Requirements")  
+    helper.should_receive(:first).and_return(true)
+    helper.should_receive(:second).and_return(true)
     
+    helper_mod = MixinMock.new(helper)
+    
+    SmsR::Actions.stub!(:requirements).and_return(helper_mod)
+        
     class SubTest < SmsR::Actions::RunnableAction
-      runnable :first, :second do |param|
-        param*param
-      end
-    end
-
-    SubTest.run(2).should be(4)
-  end
-  
-  it "should not execute runnable" +
-     "if one of the requirements isn't fulfilled" do
-     SmsR::Actions::RunnableAction.stub!(:first).and_return(false)
-     SmsR::Actions::RunnableAction.stub!(:second).and_return(true)
-
-     class SubTest < SmsR::Actions::RunnableAction
       runnable :first, :second do
         throw :was_run
       end
-     end
+    end
 
-     lambda { SubTest.run }.should_not throw_symbol(:was_run)   
-   end
-end
-
-describe SmsR::Actions::RunnableAction, "requirement #config" do
-  
-  before(:all) do
-    @config = mock("Config")
-    SmsR::Config.stub!(:load).and_return(@config)
+    lambda { SubTest.run }.should throw_symbol(:was_run)    
   end
   
-  it "should return false " +
-     "if no config for provider :nonexisting_provider exists" do
+  it "should not execute runnable requirements isn't fulfilled" do
+    helper = mock("Requirements2")  
+    helper.should_receive(:first).and_return(true)
+    helper.should_receive(:second).and_return(false)
 
+    helper_mod = MixinMock.new(helper)
+
+    SmsR::Actions.stub!(:requirements).and_return(helper_mod)
+
+    class SubTest < SmsR::Actions::RunnableAction
+      runnable :first, :second do
+        throw :was_run_but_shouldnt
+      end
+    end
+
+    lambda { SubTest.run }.should_not throw_symbol(:was_run_but_shouldnt)   
+  end
+   
+end
+
+describe SmsR::Actions::Requirements do
+  
+  before(:each) do
+    Object.send(:remove_const, :SubTest) if defined? SubTest
+  end
+  
+  after(:each) do
+    Object.send(:remove_const, :SubTest) if defined? SubTest
+  end
+  
+  
+  it "should run the defined requirements in sequence" do
+    helper = mock("RequirementsFoo")  
+    helper.should_receive(:first).and_return(true)
+    helper.should_receive(:second).and_return(false)
+    helper.should_not_receive(:third)
+    
+    helper_mod = MixinMock.new(helper)
+    
+    SmsR::Actions.stub!(:requirements).and_return(helper_mod)
+   
+    class SubTest < SmsR::Actions::RunnableAction
+      runnable :first, :second, :third do |needed|
+      end
+    end
+    
+    st = SubTest.new :p
+    st.requirements = [:first, :second, :third]
+    st.check.should be(false)
+  end
+end
+
+describe SmsR::Actions::Requirements, "requirement #config" do
+#   
+  before(:each) do
+    class Test 
+      attr_accessor :provider_name
+      include SmsR::Actions::Requirements
+      
+      def initialize
+        @error = []
+      end
+    end
+    @tester = Test.new
+    @config = mock("Config")
+  end
+  
+  after(:each) do
+    @tester = nil
+    @config = nil
+    SmsR::Config.stub!(:load).and_return(nil)
+  end
+  
+  it "should return false if no config for provider :nonexisting_provider exists" do
+    @tester.provider_name = :nonexisting_provider
+    
     @config.should_receive(:[]).
            with(:nonexisting_provider).
            and_return(nil)
-
-    SmsR::Actions::RunnableAction.
-      config(:nonexisting_provider).first.should be(false)
-  end
-
-  it "#config should return 'true' "+
-     "if config for provider :existing_provider exists" do
-  
-    @config.should_receive(:[]).
-             with(:existing_provider).
-             and_return(SmsR::OperatorConfig.new)
     
-    SmsR::Actions::RunnableAction.
-      config(:existing_provider).first.should be(true)
-  end
-        
-  it "should print error when failing" do
-    class SubTest < SmsR::Actions::RunnableAction
-      runnable :config do
-        throw :was_run
-      end
-    end
-     
-    @config.should_receive(:[]).
-           with(:really_nonexisting_provider).
-           and_return(nil)
-
-    st = SubTest.new :really_nonexisting_provider
-    st.check.should be(false)
+    SmsR.stub!(:config).and_return(@config)
     
-    st.error.should be_instance_of(Array)
+    @tester.config.should be(false)
   end
 
-  
-  it "should have no error when succeding" do
-    class SubErrorTest < SmsR::Actions::RunnableAction
-      runnable :config do |p|
-        throw :was_run
-      end
-    end
-     
-    @config.should_receive(:[]).
-           with(:really_existing_provider).
-           and_return(SmsR::OperatorConfig.new)
-           
-    lambda { SubErrorTest.run :really_existing_provider }.
-      should throw_symbol(:was_run)
-  end
-end
-
-describe SmsR::Actions::RunnableAction, "requirement #provider" do  
-  before(:all) do
-    prov_hash = {:existing_provider =>
-                    SmsR::Providers::Provider.new(lambda {  } ) }
-    SmsR::Providers.stub!(:providers).and_return(prov_hash)
-  end
-  
-  it "should return 'true' for :existing_provider" do
-    SmsR::Actions::RunnableAction.
-      provider(:existing_provider).first.should be(true)
-  end
-  
-  it "should return 'false' for :nonexisting_provider" do
-    # SmsR::Providers.providers[@provider_name.to_sym]
+  it "should return 'true' if config for :existing_provider exists" do
+    @tester.provider_name = :mongo
     
-    SmsR::Actions::RunnableAction.
-      provider(:nonexisting_provider).first.should be(false)
-  end
-end
+    @config.should_receive(:[]).
+             with(:mongo).
+             and_return(true)
 
-describe SmsR::Actions::RunnableAction, "requirement's error" do
-  
-
-  
-  it "should be added for a failing #provider requirement" do
-    pending
+    SmsR.stub!(:config).and_return(@config)    
+    
+    @tester.config.should be(true)
   end
-  
-  it "should printed instead of running the action"
+#         
+#   it "should print error when failing" do
+#     class SubTest < SmsR::Actions::RunnableAction
+#       runnable :config do
+#         throw :was_run
+#       end
+#     end
+#      
+#     @config.should_receive(:[]).
+#            with(:really_nonexisting_provider).
+#            and_return(nil)
+# 
+#     st = SubTest.new :really_nonexisting_provider
+#     st.check.should be(false)
+#     
+#     st.error.should be_instance_of(Array)
+#   end
+# 
+#   
+#   it "should have no error when succeding" do
+#     class SubErrorTest < SmsR::Actions::RunnableAction
+#       runnable :config do |p|
+#         throw :was_run
+#       end
+#     end
+#      
+#     @config.should_receive(:[]).
+#            with(:really_existing_provider).
+#            and_return(SmsR::OperatorConfig.new)
+#            
+#     lambda { SubErrorTest.run :really_existing_provider }.
+#       should throw_symbol(:was_run)
+#   end
 end
+# 
+# describe SmsR::Actions::RunnableAction, "requirement #provider" do  
+#   before(:all) do
+#     prov_hash = {:existing_provider =>
+#                     SmsR::Providers::Provider.new(lambda {  } ) }
+#     SmsR::Providers.stub!(:providers).and_return(prov_hash)
+#   end
+#   
+#   it "should return 'true' for :existing_provider" do
+#     SmsR::Actions::RunnableAction.
+#       provider(:existing_provider).first.should be(true)
+#   end
+#   
+#   it "should return 'false' for :nonexisting_provider" do
+#     # SmsR::Providers.providers[@provider_name.to_sym]
+#     
+#     SmsR::Actions::RunnableAction.
+#       provider(:nonexisting_provider).first.should be(false)
+#   end
+# end
+# 
+# describe SmsR::Actions::RunnableAction, "requirement's error" do
+#   
+# 
+#   
+#   it "should be added for a failing #provider requirement" do
+#     pending
+#   end
+#   
+#   it "should printed instead of running the action"
+# end

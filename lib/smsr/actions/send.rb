@@ -1,26 +1,29 @@
+require "rubygems"
+require "rake"
+
 module SmsR
 module Actions
   
     class Send < RunnableAction
     runnable do 
-      SmsR::Providers.load
+      SmsR::Providers.load(*FileList["#{SmsR::Providers::DEFAULT_PROVIDERS}/*.rb"])
       
       SmsR.info "Available providers:"
       SmsR::Providers.providers.each { |k,v| SmsR.info "  #{k}"}
     end
     
-    runnable do |provider_name, number, message|
-      SmsR::Providers.load
+    runnable :provider, :config do |provider_name, number, message|
+      SmsR::Providers.load(*FileList["#{SmsR::Providers::DEFAULT_PROVIDERS}/*.rb"])
       
-      unless provider_itself[:exists?]
-        SmsR.info provider_itself[:error]
-        return
-      end
-
-      unless provider_config[:exists?]
-        SmsR.info(*provider_config[:error])
-        return
-      end
+      # unless provider_itself[:exists?]
+      #   SmsR.info provider_itself[:error]
+      #   return
+      # end
+      # 
+      # unless provider_config[:exists?]
+      #   SmsR.info(*provider_config[:error])
+      #   return
+      # end
       
       SmsR.debug "using #{provider_itself[:provider]} " +
                   "with config #{provider_config[:config]}"
