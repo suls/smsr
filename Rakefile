@@ -33,7 +33,7 @@ namespace :spec do
   desc "Run all specs with rcov"
   Spec::Rake::SpecTask.new('rcov') do |t|
     t.spec_files = FileList['spec/**/*_spec.rb']
-    p t.spec_files
+
     t.rcov = true
     t.rcov_opts << 
       '--exclude' << 
@@ -45,6 +45,8 @@ namespace :spec do
   RCov::VerifyTask.new(:coverage => "spec:rcov") do |t|
     t.threshold = 90.0 # Make sure you have rcov 0.7 or higher!
     t.index_html = File.dirname(__FILE__) + '/coverage/index.html'
+    
+    system "open coverage/index.html" if RUBY_PLATFORM =~ /darwin/
   end
 
   desc "Run all specs"

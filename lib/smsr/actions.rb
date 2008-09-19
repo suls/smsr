@@ -83,7 +83,7 @@ module Actions
     def provider
       @provider = SmsR::Providers.providers[@provider_name] 
       unless !!@config
-        @error << ["Provider '#{provider_name}' not found."]
+        @error << ["Provider '#{@provider_name}' not found."]
       end
       !!@provider
     end

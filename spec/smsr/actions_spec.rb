@@ -84,118 +84,42 @@ describe SmsR::Actions::RunnableAction do
 
     lambda { SubTest.run }.should_not throw_symbol(:was_run_but_shouldnt)   
   end
-   
-end
 
-describe SmsR::Actions::Requirements do
-  
-  before(:each) do
-    Object.send(:remove_const, :SubTest) if defined? SubTest
-  end
-  
-  after(:each) do
-    Object.send(:remove_const, :SubTest) if defined? SubTest
-  end
-  
-  
-  it "should run the defined requirements in sequence" do
-    helper = mock("RequirementsFoo")  
-    helper.should_receive(:first).and_return(true)
-    helper.should_receive(:second).and_return(false)
-    helper.should_not_receive(:third)
-    
+  it "should print the error if execution failed" do    
+    helper = mock("Requirements")
+    helper.should_receive(:first).and_return(false)
+
     helper_mod = MixinMock.new(helper)
-    
+
     SmsR::Actions.stub!(:requirements).and_return(helper_mod)
-   
+    SmsR.stub!(:info)
+    SmsR.should_receive(:info)
+    
     class SubTest < SmsR::Actions::RunnableAction
-      runnable :first, :second, :third do |needed|
+      runnable :first do
+        throw :was_run_but_shouldnt
       end
     end
     
-    st = SubTest.new :p
-    st.requirements = [:first, :second, :third]
-    st.check.should be(false)
+    SubTest.run
   end
-end
+  
+  it "should not print the error if execution succeded" do    
+    helper = mock("Requirements")
+    helper.should_receive(:first).and_return(true)
 
-describe SmsR::Actions::Requirements, "requirement #config" do
-#   
-  before(:each) do
-    class Test 
-      attr_accessor :provider_name, :error
-      include SmsR::Actions::Requirements
-      
-      def initialize
-        @error = []
+    helper_mod = MixinMock.new(helper)
+
+    SmsR::Actions.stub!(:requirements).and_return(helper_mod)
+
+    SmsR.should_not_receive(:info)
+    
+    class SubTest < SmsR::Actions::RunnableAction
+      runnable :first do
+        nil
       end
     end
-    @tester = Test.new
-    @config = mock("Config")
-  end
-  
-  after(:each) do
-    @tester = nil
-    @config = nil
-    SmsR::Config.stub!(:load).and_return(nil)
-  end
-  
-  it "should return false if no config for provider :nonexisting_provider exists" do
-    @tester.provider_name = :nonexisting_provider
     
-    @config.should_receive(:[]).
-           with(:nonexisting_provider).
-           and_return(nil)
-    
-    SmsR.stub!(:config).and_return(@config)
-    
-    @tester.config.should be(false)
-  end
-
-  it "should return 'true' if config for :existing_provider_1 exists" do
-    @tester.provider_name = :existing_provider
-    
-    @config.should_receive(:[]).
-             with(:existing_provider).
-             and_return(true)
-
-    SmsR.stub!(:config).and_return(@config)    
-    
-    @tester.config.should be(true)
-  end
-        
-  it "should add an error to @error when failing" do
-    @tester.provider_name = :nonexisting_provider
-
-    @config.should_receive(:[]).
-             with(:nonexisting_provider).
-             and_return(nil)
-
-    SmsR.stub!(:config).and_return(@config)    
-
-    @tester.config
-    
-    @tester.error.size.should_not be(0) 
+    SubTest.run
   end
 end
-
-# describe SmsR::Actions::Requirements, "requirement #provider" do  
-#   before(:all) do
-#     include SmsR::Actions::Requirements
-#     @providers = mock("Providers")
-#     @provider_name = :blubb
-#   end
-#   
-#   it "should return 'true' for :existing_provider" do
-#     
-#     SmsR::Providers.stub!(:providers).and_return(@providers)
-#     provider
-#   end
-#   
-#   # it "should return 'false' for :nonexisting_provider" do
-#   #   # SmsR::Providers.providers[@provider_name.to_sym]
-#   #   
-#   #   SmsR::Actions::RunnableAction.
-#   #     provider(:nonexisting_provider).first.should be(false)
-#   # end
-# end
