@@ -123,7 +123,7 @@ describe SmsR::Actions::Requirements, "requirement #config" do
 #   
   before(:each) do
     class Test 
-      attr_accessor :provider_name
+      attr_accessor :provider_name, :error
       include SmsR::Actions::Requirements
       
       def initialize
@@ -152,79 +152,50 @@ describe SmsR::Actions::Requirements, "requirement #config" do
     @tester.config.should be(false)
   end
 
-  it "should return 'true' if config for :existing_provider exists" do
-    @tester.provider_name = :mongo
+  it "should return 'true' if config for :existing_provider_1 exists" do
+    @tester.provider_name = :existing_provider
     
     @config.should_receive(:[]).
-             with(:mongo).
+             with(:existing_provider).
              and_return(true)
 
     SmsR.stub!(:config).and_return(@config)    
     
     @tester.config.should be(true)
   end
-#         
-#   it "should print error when failing" do
-#     class SubTest < SmsR::Actions::RunnableAction
-#       runnable :config do
-#         throw :was_run
-#       end
-#     end
-#      
-#     @config.should_receive(:[]).
-#            with(:really_nonexisting_provider).
-#            and_return(nil)
-# 
-#     st = SubTest.new :really_nonexisting_provider
-#     st.check.should be(false)
-#     
-#     st.error.should be_instance_of(Array)
-#   end
-# 
-#   
-#   it "should have no error when succeding" do
-#     class SubErrorTest < SmsR::Actions::RunnableAction
-#       runnable :config do |p|
-#         throw :was_run
-#       end
-#     end
-#      
-#     @config.should_receive(:[]).
-#            with(:really_existing_provider).
-#            and_return(SmsR::OperatorConfig.new)
-#            
-#     lambda { SubErrorTest.run :really_existing_provider }.
-#       should throw_symbol(:was_run)
-#   end
+        
+  it "should add an error to @error when failing" do
+    @tester.provider_name = :nonexisting_provider
+
+    @config.should_receive(:[]).
+             with(:nonexisting_provider).
+             and_return(nil)
+
+    SmsR.stub!(:config).and_return(@config)    
+
+    @tester.config
+    
+    @tester.error.size.should_not be(0) 
+  end
 end
-# 
-# describe SmsR::Actions::RunnableAction, "requirement #provider" do  
+
+# describe SmsR::Actions::Requirements, "requirement #provider" do  
 #   before(:all) do
-#     prov_hash = {:existing_provider =>
-#                     SmsR::Providers::Provider.new(lambda {  } ) }
-#     SmsR::Providers.stub!(:providers).and_return(prov_hash)
+#     include SmsR::Actions::Requirements
+#     @providers = mock("Providers")
+#     @provider_name = :blubb
 #   end
 #   
 #   it "should return 'true' for :existing_provider" do
-#     SmsR::Actions::RunnableAction.
-#       provider(:existing_provider).first.should be(true)
-#   end
-#   
-#   it "should return 'false' for :nonexisting_provider" do
-#     # SmsR::Providers.providers[@provider_name.to_sym]
 #     
-#     SmsR::Actions::RunnableAction.
-#       provider(:nonexisting_provider).first.should be(false)
-#   end
-# end
-# 
-# describe SmsR::Actions::RunnableAction, "requirement's error" do
-#   
-# 
-#   
-#   it "should be added for a failing #provider requirement" do
-#     pending
+#     SmsR::Providers.stub!(:providers).and_return(@providers)
+#     provider
 #   end
 #   
-#   it "should printed instead of running the action"
+#   # it "should return 'false' for :nonexisting_provider" do
+#   #   # SmsR::Providers.providers[@provider_name.to_sym]
+#   #   
+#   #   SmsR::Actions::RunnableAction.
+#   #     provider(:nonexisting_provider).first.should be(false)
+#   # end
 # end
