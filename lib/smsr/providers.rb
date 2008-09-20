@@ -27,7 +27,7 @@ module Providers
         # @providers = {} if drop_existing
         module_eval data, file
       else
-        SmsR.info "Provider file #{file} doesn't exist."
+        SmsR.debug "Provider file #{file} doesn't exist."
       end
     end
     providers
