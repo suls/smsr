@@ -9,14 +9,17 @@ module Actions
         child.instance_eval do 
           initialize_class
           def self.run(*args)
-            SmsR::Providers.load
             args.flatten!
             SmsR.debug "running #{self.name} .. (#run_#{args.size})",
                         "with args: #{args.join(',')}"
             runner = self.new(args.first)
             
-            SmsR.info runner.error unless runner.
+            if runner.respond_to? :"run_#{args.size}"
+              SmsR.info runner.error unless runner.
                                             send(:"run_#{args.size}", *args)
+            else
+              SmsR.info ".. doesn't know what to do.", "Please check 'smsr -h' ad see the available options."
+            end
           end
         end
         super
@@ -92,7 +95,9 @@ module Actions
       require "rubygems"
       require "rake"
       providers = FileList["#{SmsR::Providers::DEFAULT_PROVIDERS}/*.rb"]
-      SmsR::Providers.load(*providers)
+      providers << ENV['HOME']+'/.smsr_providers'
+      SmsR.debug providers 
+      @error = SmsR::Providers.load(*providers)
     end
   end
   # module requirements
