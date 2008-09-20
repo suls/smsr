@@ -42,7 +42,18 @@ module SmsR
     
     begin
       OptionParser.new do |opts|
-        opts.banner = "Usage: smsr [options]"
+        opts.banner = <<BANNER
+Usage: smsr [action] [parameters] [options]
+
+  To send a sms:
+  
+    $ smsr-send provider_name 079xx "this is my message"
+  
+  Provider 'provider_name' must exist. To see what providers exist:
+  
+    $ smsr list
+  
+BANNER
 
         opts.on("-d", "--debug", "Show debug log statements") do |d|
           options.debug = d 
