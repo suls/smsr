@@ -10,26 +10,12 @@ module Actions
       SmsR::Providers.providers.each { |k,v| SmsR.info "  #{k}"}
     end
     
-    runnable :provider, :config do |provider_name, number, message|
-      SmsR::Providers.load(*FileList["#{SmsR::Providers::DEFAULT_PROVIDERS}/*.rb"])
+    runnable :load_providers, :config, :provider do |provider_name, number, message|
+        
+      SmsR.debug "using #{@provider} " +
+                              "with config #{@config}"
       
-      # unless provider_itself[:exists?]
-      #   SmsR.info provider_itself[:error]
-      #   return
-      # end
-      # 
-      # unless provider_config[:exists?]
-      #   SmsR.info(*provider_config[:error])
-      #   return
-      # end
-      
-      SmsR.debug "using #{provider_itself[:provider]} " +
-                  "with config #{provider_config[:config]}"
-      
-      
-      provider_itself[:provider].call provider_config[:config].user, 
-                                      provider_config[:config].password,
-                                      number, message      
+      @provider.call @config.user, @config.password, number, message      
       
     end
   end
