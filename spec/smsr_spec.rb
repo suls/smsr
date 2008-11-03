@@ -26,14 +26,14 @@ end
 describe SmsR, "cmd line tools" do
   it "should add 'config' to args when smsr-config is invoked" do
     SmsR.stub!(:start)    
-    SmsR.should_receive(:start).with(["config"])
+    SmsR.should_receive(:start).with(["config"] + ARGV)
     
     load File.dirname(__FILE__) + '/../bin/smsr-config'
   end
   
   it "should add 'send' to args when smsr-send is invoked" do
     SmsR.stub!(:start)    
-    SmsR.should_receive(:start).with(["send"])
+    SmsR.should_receive(:start).with(["send"] + ARGV)
     
     load File.dirname(__FILE__) + '/../bin/smsr-send'
   end
