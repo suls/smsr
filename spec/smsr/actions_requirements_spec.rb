@@ -93,9 +93,10 @@ describe SmsR::Actions::Requirements, "requirement #config" do
 end
 
 describe SmsR::Actions::Requirements, "requirement #provider" do  
-
+  
+  include SmsR::Actions::Requirements
+  
   before(:each) do
-    include SmsR::Actions::Requirements
     @providers = mock("Providers")
     @provider_name = :blubb
     @error = []
