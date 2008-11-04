@@ -7,7 +7,6 @@ Rakefile
 bin/smsr
 bin/smsr-config
 bin/smsr-send
-cucumber.gemspec
 lib/providers/hispeed.rb
 lib/providers/o2.rb
 lib/providers/orange.rb
