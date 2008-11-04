@@ -12,7 +12,7 @@ task :clean => ["spec:clobber_rcov", "hoe:clean"] do
 end
 
 namespace :hoe do
-Hoe.new('smsr', SmsR::VERSION::STRING) do |p|
+$hoe = Hoe.new('smsr', SmsR::VERSION::STRING) do |p|
   p.summary = SmsR::VERSION::SUMMARY
   p.url = 'http://sulsarts.ch/p/smsr'
   p.description = "Simple commandline utility for sending sms."
@@ -55,3 +55,16 @@ namespace :spec do
   end
 end
 
+namespace :gemspec do
+  desc 'Refresh smsr.gemspec to include ALL files'
+  task :refresh => 'manifest:refresh' do
+    File.open('smsr.gemspec', 'w') {|io| io.write($hoe.spec.to_ruby)}
+  end
+end
+
+namespace :manifest do
+  desc 'Recreate Manifest.txt to include ALL files'
+  task :refresh do
+    `rake hoe:check_manifest | patch -p0 > Manifest.txt`
+  end
+end
